@@ -85,7 +85,7 @@ export const useGhostMovement = (
       nextDirection: 'up',
       state: 'scatter',
       frightenedTimer: null,
-      targetPosition: { x: MAZE_WIDTH - 1, y: MAZE_HEIGHT - 1 }
+      targetPosition: { x: 0, y: MAZE_HEIGHT - 1 }
     },
     { 
       type: 'clyde', 
@@ -94,7 +94,7 @@ export const useGhostMovement = (
       nextDirection: 'up',
       state: 'scatter',
       frightenedTimer: null,
-      targetPosition: { x: 0, y: MAZE_HEIGHT - 1 }
+      targetPosition: { x: MAZE_WIDTH - 1, y: MAZE_HEIGHT - 1 }
     }
   ]);
   
