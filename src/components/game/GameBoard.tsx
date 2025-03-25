@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Cell from './Cell';
 import Pacman from './Pacman';
@@ -20,7 +21,8 @@ import {
   calculateGhostTarget,
   getBestDirection,
   checkCollision,
-  countRemainingPellets
+  countRemainingPellets,
+  calculateDistance
 } from '../../utils/gameUtils';
 import GameControls from './GameControls';
 import GameOver from './GameOver';
