@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,5 +98,104 @@
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+@layer components {
+  .game-container {
+    background-color: #000;
+    max-width: 100%;
+    max-height: 100vh;
+    aspect-ratio: 1 / 1;
+    @apply relative overflow-hidden rounded-lg shadow-xl;
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .pacman {
+    @apply bg-game-pacman relative rounded-full transition-all duration-100;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+  }
+
+  .pellet {
+    @apply bg-game-pellet absolute rounded-full;
+    @apply animate-pulse-soft;
+  }
+
+  .power-pellet {
+    @apply bg-game-power-pellet absolute rounded-full;
+    @apply animate-pulse-soft;
+  }
+
+  .ghost {
+    @apply absolute rounded-t-full transition-all duration-150 ease-in-out;
+    @apply animate-ghost-move;
+  }
+
+  .ghost-frightened {
+    @apply bg-game-frightened;
+  }
+
+  .ghost-eyes {
+    @apply bg-white rounded-full absolute;
+  }
+
+  .ghost-pupil {
+    @apply bg-black rounded-full absolute;
+  }
+
+  .game-title {
+    @apply font-bold tracking-tight;
+    @apply animate-float;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-panel {
+    @apply bg-white/10 backdrop-blur-md rounded-xl shadow-lg;
+    @apply border border-white/20;
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .game-btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .primary-btn {
+    @apply game-btn bg-white text-black hover:bg-white/90;
+    @apply shadow-[0_0_0_1px_rgba(255,255,255,0.2),0_2px_4px_0_rgba(0,0,0,0.1)];
+  }
+
+  .secondary-btn {
+    @apply game-btn bg-black/30 text-white hover:bg-black/40;
+    @apply border border-white/10;
+  }
+}
+
+/* Game specific styles */
+.cell {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.wall {
+  @apply bg-game-maze rounded-sm;
+  box-shadow: 0 0 8px rgba(33, 33, 255, 0.4);
+}
+
+.score-counter {
+  font-variant-numeric: tabular-nums;
+}
+
+.game-over-overlay {
+  @apply fixed inset-0 bg-black/70 backdrop-blur-sm z-50;
+  @apply flex flex-col items-center justify-center;
+  @apply animate-fade-in;
+}
+
+.game-over-card {
+  @apply glass-panel p-8 max-w-md w-full mx-auto;
+  @apply flex flex-col gap-6 items-center;
+  @apply animate-scale-up;
 }

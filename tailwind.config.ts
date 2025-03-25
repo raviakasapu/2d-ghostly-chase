@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,18 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Game specific colors
+				game: {
+					'pacman': '#FFCC00',
+					'blinky': '#FF0000',
+					'pinky': '#FFB8FF',
+					'inky': '#00FFFF',
+					'clyde': '#FFB852',
+					'frightened': '#2121FF',
+					'maze': '#2121FF',
+					'pellet': '#FFFFFF',
+					'power-pellet': '#FFFFFF'
 				}
 			},
 			borderRadius: {
@@ -84,11 +97,51 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'chomp': {
+					'0%, 100%': { transform: 'rotate(45deg)' },
+					'50%': { transform: 'rotate(0deg)' }
+				},
+				'blink': {
+					'0%, 49%': { opacity: '1' },
+					'50%, 100%': { opacity: '0' }
+				},
+				'ghost-move': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-4px)' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'fade-out': {
+					'0%': { opacity: '1' },
+					'100%': { opacity: '0' }
+				},
+				'scale-up': {
+					'0%': { transform: 'scale(0.9)', opacity: '0' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
+				'pulse-soft': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.7' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'chomp': 'chomp 0.3s linear infinite',
+				'blink': 'blink 0.5s linear infinite',
+				'ghost-move': 'ghost-move 0.5s ease-in-out infinite',
+				'fade-in': 'fade-in 0.4s ease-out',
+				'fade-out': 'fade-out 0.4s ease-out',
+				'scale-up': 'scale-up 0.3s ease-out',
+				'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
+				'float': 'float 3s ease-in-out infinite'
 			}
 		}
 	},
