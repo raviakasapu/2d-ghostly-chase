@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -114,7 +113,7 @@
 
   .pacman {
     @apply bg-game-pacman relative rounded-full transition-all duration-100;
-    clip-path: polygon(0 0, 100% 50%, 0 100%);
+    clip-path: polygon(50% 50%, 100% 0, 100% 25%, 100% 75%, 100% 100%, 0 100%, 0 0);
   }
 
   .pellet {
@@ -128,20 +127,72 @@
   }
 
   .ghost {
-    @apply absolute rounded-t-full transition-all duration-150 ease-in-out;
+    @apply transition-all duration-150 ease-in-out;
     @apply animate-ghost-move;
   }
 
-  .ghost-frightened {
+  .ghost-blinky .ghost-body {
+    @apply bg-game-blinky;
+  }
+
+  .ghost-pinky .ghost-body {
+    @apply bg-game-pinky;
+  }
+
+  .ghost-inky .ghost-body {
+    @apply bg-game-inky;
+  }
+
+  .ghost-clyde .ghost-body {
+    @apply bg-game-clyde;
+  }
+
+  .ghost-frightened .ghost-body {
     @apply bg-game-frightened;
   }
 
-  .ghost-eyes {
-    @apply bg-white rounded-full absolute;
+  .ghost-wave {
+    position: relative;
+    height: 100%;
+  }
+
+  .ghost-wave:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0 0 50% 50%;
+  }
+
+  .ghost-blinky .ghost-wave:before {
+    @apply bg-game-blinky;
+  }
+
+  .ghost-pinky .ghost-wave:before {
+    @apply bg-game-pinky;
+  }
+
+  .ghost-inky .ghost-wave:before {
+    @apply bg-game-inky;
+  }
+
+  .ghost-clyde .ghost-wave:before {
+    @apply bg-game-clyde;
+  }
+
+  .ghost-frightened .ghost-wave:before {
+    @apply bg-game-frightened;
+  }
+
+  .ghost-eye {
+    @apply bg-white rounded-full relative;
   }
 
   .ghost-pupil {
     @apply bg-black rounded-full absolute;
+    transition: transform 0.2s ease;
   }
 
   .game-title {
@@ -180,8 +231,8 @@
 }
 
 .wall {
-  @apply bg-game-maze rounded-sm;
-  box-shadow: 0 0 8px rgba(33, 33, 255, 0.4);
+  @apply bg-game-maze rounded-lg;
+  box-shadow: 0 0 12px rgba(33, 33, 255, 0.6);
 }
 
 .score-counter {
@@ -198,4 +249,14 @@
   @apply glass-panel p-8 max-w-md w-full mx-auto;
   @apply flex flex-col gap-6 items-center;
   @apply animate-scale-up;
+}
+
+@keyframes chomp {
+  0% { clip-path: polygon(50% 50%, 100% 0, 100% 25%, 100% 75%, 100% 100%, 0 100%, 0 0); }
+  50% { clip-path: polygon(50% 50%, 100% 25%, 100% 75%, 0% 75%, 0% 25%); }
+  100% { clip-path: polygon(50% 50%, 100% 0, 100% 25%, 100% 75%, 100% 100%, 0 100%, 0 0); }
+}
+
+.animate-chomp {
+  animation: chomp 0.3s linear infinite;
 }

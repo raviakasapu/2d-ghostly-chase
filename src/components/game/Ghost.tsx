@@ -14,53 +14,11 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
   // Determine ghost color based on state and type
   const ghostColor = state === 'frightened' 
     ? 'ghost-frightened' 
-    : `bg-game-${type}`;
-  
-  // Different eye positions based on direction
-  const getEyeStyles = (direction: Direction) => {
-    const baseEyeStyles = {
-      left: { left: size * 0.1, top: size * 0.2 },
-      right: { left: size * 0.55, top: size * 0.2 }
-    };
-    
-    // Adjust pupil position based on direction
-    const leftPupilStyles = { left: size * 0.2, top: size * 0.2 };
-    const rightPupilStyles = { left: size * 0.65, top: size * 0.2 };
-    
-    switch (direction) {
-      case 'up':
-        leftPupilStyles.top = size * 0.15;
-        rightPupilStyles.top = size * 0.15;
-        break;
-      case 'down':
-        leftPupilStyles.top = size * 0.25;
-        rightPupilStyles.top = size * 0.25;
-        break;
-      case 'left':
-        leftPupilStyles.left = size * 0.15;
-        rightPupilStyles.left = size * 0.6;
-        break;
-      case 'right':
-        leftPupilStyles.left = size * 0.25;
-        rightPupilStyles.left = size * 0.7;
-        break;
-      default:
-        break;
-    }
-    
-    return {
-      leftEye: baseEyeStyles.left,
-      rightEye: baseEyeStyles.right,
-      leftPupil: leftPupilStyles,
-      rightPupil: rightPupilStyles
-    };
-  };
-  
-  const eyeStyles = getEyeStyles(direction);
+    : `ghost-${type}`;
   
   return (
     <div
-      className={`ghost ${ghostColor}`}
+      className={`ghost ${ghostColor} absolute`}
       style={{
         width: size,
         height: size,
@@ -68,54 +26,53 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
         top: position.y * size,
       }}
     >
+      {/* Ghost body */}
+      <div className="ghost-body h-3/4 w-full rounded-t-full relative">
+        {/* Ghost bottom wavy part */}
+        <div className="ghost-bottom absolute bottom-0 left-0 w-full h-1/4">
+          <div className="flex h-full">
+            <div className="w-1/5 h-full ghost-wave" />
+            <div className="w-1/5 h-full ghost-wave" />
+            <div className="w-1/5 h-full ghost-wave" />
+            <div className="w-1/5 h-full ghost-wave" />
+            <div className="w-1/5 h-full ghost-wave" />
+          </div>
+        </div>
+      </div>
+      
       {/* Eyes only shown in normal state */}
       {state !== 'frightened' && (
-        <>
-          {/* Left eye */}
-          <div
-            className="ghost-eyes"
-            style={{
-              width: size * 0.3,
-              height: size * 0.3,
-              ...eyeStyles.leftEye
-            }}
-          >
-            <div
-              className="ghost-pupil"
-              style={{
-                width: size * 0.15,
-                height: size * 0.15,
-                left: size * 0.075,
-                top: size * 0.075,
-              }}
-            />
+        <div className="absolute top-1/4 left-0 w-full flex justify-center space-x-2">
+          <div className="ghost-eye bg-white w-1/4 h-1/3 rounded-full flex justify-center items-center">
+            <div className="ghost-pupil bg-black w-1/2 h-1/2 rounded-full" 
+                 style={{
+                   transform: `translate(${
+                     direction === 'left' ? '-25%' : 
+                     direction === 'right' ? '25%' : '0'
+                   }%, ${
+                     direction === 'up' ? '-25%' : 
+                     direction === 'down' ? '25%' : '0'
+                   }%)`
+                 }}/>
           </div>
-          
-          {/* Right eye */}
-          <div
-            className="ghost-eyes"
-            style={{
-              width: size * 0.3,
-              height: size * 0.3,
-              ...eyeStyles.rightEye
-            }}
-          >
-            <div
-              className="ghost-pupil"
-              style={{
-                width: size * 0.15,
-                height: size * 0.15,
-                left: size * 0.075,
-                top: size * 0.075,
-              }}
-            />
+          <div className="ghost-eye bg-white w-1/4 h-1/3 rounded-full flex justify-center items-center">
+            <div className="ghost-pupil bg-black w-1/2 h-1/2 rounded-full"
+                 style={{
+                   transform: `translate(${
+                     direction === 'left' ? '-25%' : 
+                     direction === 'right' ? '25%' : '0'
+                   }%, ${
+                     direction === 'up' ? '-25%' : 
+                     direction === 'down' ? '25%' : '0'
+                   }%)`
+                 }}/>
           </div>
-        </>
+        </div>
       )}
       
-      {/* Frightened eyes */}
+      {/* Frightened face */}
       {state === 'frightened' && (
-        <div className="relative w-full h-full flex justify-center items-center">
+        <div className="absolute top-1/3 left-0 w-full flex justify-center">
           <div className="text-white font-bold text-xl">?</div>
         </div>
       )}

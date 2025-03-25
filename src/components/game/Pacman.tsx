@@ -13,7 +13,7 @@ interface PacmanProps {
 const Pacman: React.FC<PacmanProps> = ({ position, direction, size, isMoving }) => {
   return (
     <div
-      className={`pacman ${isMoving ? 'animate-chomp' : ''}`}
+      className={`pacman absolute ${isMoving ? 'animate-chomp' : ''}`}
       style={{
         width: size,
         height: size,
@@ -21,7 +21,10 @@ const Pacman: React.FC<PacmanProps> = ({ position, direction, size, isMoving }) 
         top: position.y * size,
         transform: `rotate(${DIRECTION_DEGREES[direction]}deg)`,
       }}
-    />
+    >
+      {/* Inner circle to create pacman shape */}
+      <div className="absolute inset-0 bg-game-pacman rounded-full" />
+    </div>
   );
 };
 
