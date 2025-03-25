@@ -16,18 +16,24 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
     ? 'ghost-frightened' 
     : `ghost-${type}`;
   
+  // Add rotation for Clyde (orange ghost)
+  const isClyde = type === 'clyde';
+  const rotation = isClyde ? 'animate-spin' : '';
+  const rotationDuration = isClyde ? 'animation-duration: 4s' : '';
+  
   return (
     <div
-      className={`ghost ${ghostColor} absolute`}
+      className={`ghost ${ghostColor} absolute ${rotation}`}
       style={{
         width: size,
         height: size,
         left: position.x * size,
         top: position.y * size,
+        ...(rotationDuration ? { style: rotationDuration } : {})
       }}
     >
-      {/* Ghost body */}
-      <div className="ghost-body w-full h-3/4 rounded-t-full relative">
+      {/* Ghost body - more rounded with proper ghost shape */}
+      <div className="ghost-body w-full h-3/4 rounded-t-full relative overflow-visible">
         {/* Ghost bottom wavy part */}
         <div className="ghost-bottom absolute bottom-0 left-0 w-full h-1/4">
           <div className="flex h-full">
@@ -39,12 +45,12 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
           </div>
         </div>
         
-        {/* Eyes - only shown in normal state */}
+        {/* Eyes - larger, more expressive when in normal state */}
         {state !== 'frightened' && (
-          <div className="absolute top-1/4 left-0 w-full flex justify-center space-x-1">
-            <div className="ghost-eye w-1/4 h-1/2 rounded-full flex justify-center items-center">
+          <div className="absolute top-1/4 left-0 w-full flex justify-center space-x-2">
+            <div className="ghost-eye w-1/4 h-2/5 rounded-full bg-white flex justify-center items-center">
               <div 
-                className="ghost-pupil w-1/2 h-1/2 rounded-full" 
+                className="ghost-pupil w-1/2 h-1/2 rounded-full bg-black" 
                 style={{
                   transform: `translate(${
                     direction === 'left' ? '-25%' : 
@@ -56,9 +62,9 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
                 }}
               />
             </div>
-            <div className="ghost-eye w-1/4 h-1/2 rounded-full flex justify-center items-center">
+            <div className="ghost-eye w-1/4 h-2/5 rounded-full bg-white flex justify-center items-center">
               <div 
-                className="ghost-pupil w-1/2 h-1/2 rounded-full"
+                className="ghost-pupil w-1/2 h-1/2 rounded-full bg-black"
                 style={{
                   transform: `translate(${
                     direction === 'left' ? '-25%' : 
@@ -73,14 +79,17 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
           </div>
         )}
 
-        {/* Frightened face */}
+        {/* Frightened face - improved with blue color and expressive mouth */}
         {state === 'frightened' && (
           <div className="absolute top-1/4 left-0 w-full flex flex-col items-center justify-center">
-            <div className="flex justify-center space-x-2 mb-1">
-              <div className="bg-white w-1/5 h-1 rounded-full"></div>
-              <div className="bg-white w-1/5 h-1 rounded-full"></div>
+            <div className="flex justify-center space-x-4 mb-2">
+              <div className="bg-white w-1/6 h-1.5 rounded-full"></div>
+              <div className="bg-white w-1/6 h-1.5 rounded-full"></div>
             </div>
-            <div className="bg-white w-2/5 h-1 mt-2 rounded-full"></div>
+            <div className="bg-white w-2/5 h-1.5 mt-2 rounded-full" style={{ 
+              borderRadius: '40%',
+              transform: 'rotate(180deg)'
+            }}></div>
           </div>
         )}
       </div>

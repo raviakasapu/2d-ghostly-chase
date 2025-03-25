@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Cell from './Cell';
 import Pacman from './Pacman';
@@ -46,7 +45,6 @@ const inkyCirclePath = [
 ];
 
 const GameBoard: React.FC = () => {
-  // Game state
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
     lives: 3,
@@ -57,14 +55,12 @@ const GameBoard: React.FC = () => {
     highScore: parseInt(localStorage.getItem('pacmanHighScore') || '0')
   });
   
-  // Game elements state
   const [maze, setMaze] = useState<number[][]>(JSON.parse(JSON.stringify(INITIAL_MAZE)));
   const [pacmanPosition, setPacmanPosition] = useState<Position>({...INITIAL_PACMAN_POSITION});
   const [pacmanDirection, setPacmanDirection] = useState<Direction>('none');
   const [queuedDirection, setQueuedDirection] = useState<Direction>('none');
   const [isMoving, setIsMoving] = useState<boolean>(false);
   
-  // Ghosts state
   const [ghosts, setGhosts] = useState<GhostType[]>([
     { 
       type: 'blinky', 
@@ -104,78 +100,64 @@ const GameBoard: React.FC = () => {
     }
   ]);
   
-  // Path indices for Clyde and Inky
   const [clydePathIndex, setClydePathIndex] = useState(0);
   const [inkyPathIndex, setInkyPathIndex] = useState(0);
   
-  // Game timers
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
   const ghostLoopRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Sound effects references
   const eatPelletSoundRef = useRef<HTMLAudioElement | null>(null);
   const eatPowerPelletSoundRef = useRef<HTMLAudioElement | null>(null);
   const deathSoundRef = useRef<HTMLAudioElement | null>(null);
   const ghostEatenSoundRef = useRef<HTMLAudioElement | null>(null);
   
-  // Initialize sound effects
   useEffect(() => {
-    // Create audio elements in memory
     eatPelletSoundRef.current = new Audio();
     eatPowerPelletSoundRef.current = new Audio();
     deathSoundRef.current = new Audio();
     ghostEatenSoundRef.current = new Audio();
     
-    // Set audio sources
     if (eatPelletSoundRef.current) eatPelletSoundRef.current.volume = 0.2;
     if (eatPowerPelletSoundRef.current) eatPowerPelletSoundRef.current.volume = 0.3;
     if (deathSoundRef.current) deathSoundRef.current.volume = 0.4;
     if (ghostEatenSoundRef.current) ghostEatenSoundRef.current.volume = 0.3;
   }, []);
   
-  // Handle pellet and power pellet consumption
   const consumePellet = useCallback((position: Position) => {
     const { x, y } = position;
     const cellValue = maze[y][x];
     
     if (cellValue === 2) {
-      // Regular pellet
       setMaze(prevMaze => {
         const newMaze = [...prevMaze];
-        newMaze[y][x] = 1; // set to empty
+        newMaze[y][x] = 1;
         return newMaze;
       });
       
-      // Play sound
       if (eatPelletSoundRef.current) {
         eatPelletSoundRef.current.play().catch(() => {});
       }
       
-      // Update score
       setGameState(prev => ({
         ...prev,
         score: prev.score + 10
       }));
     } else if (cellValue === 3) {
-      // Power pellet
       setMaze(prevMaze => {
         const newMaze = [...prevMaze];
-        newMaze[y][x] = 1; // set to empty
+        newMaze[y][x] = 1;
         return newMaze;
       });
       
-      // Play sound
       if (eatPowerPelletSoundRef.current) {
         eatPowerPelletSoundRef.current.play().catch(() => {});
       }
       
-      // Update score
       setGameState(prev => ({
         ...prev,
         score: prev.score + 50
       }));
       
-      // Make ghosts frightened
       setGhosts(prevGhosts => 
         prevGhosts.map(ghost => ({
           ...ghost,
@@ -186,28 +168,23 @@ const GameBoard: React.FC = () => {
     }
   }, [maze]);
   
-  // Check if all pellets are collected
   useEffect(() => {
     const pelletCount = countRemainingPellets(maze);
     
     if (pelletCount === 0 && gameState.gameStarted && !gameState.gameOver) {
-      // Level completed
       setGameState(prev => ({
         ...prev,
         level: prev.level + 1
       }));
       
-      // Reset game state but keep score and lives
       resetGame(false);
     }
   }, [maze, gameState.gameStarted, gameState.gameOver]);
   
-  // Handle ghost-pacman collisions
   const checkGhostCollisions = useCallback(() => {
     for (const ghost of ghosts) {
       if (checkCollision(ghost.position, pacmanPosition)) {
         if (ghost.state === 'frightened') {
-          // Pacman eats ghost
           setGhosts(prevGhosts => 
             prevGhosts.map(g => 
               g.type === ghost.type
@@ -221,28 +198,23 @@ const GameBoard: React.FC = () => {
             )
           );
           
-          // Play sound
           if (ghostEatenSoundRef.current) {
             ghostEatenSoundRef.current.play().catch(() => {});
           }
           
-          // Update score
           setGameState(prev => ({
             ...prev,
             score: prev.score + 200
           }));
         } else {
-          // Ghost eats pacman
           if (deathSoundRef.current) {
             deathSoundRef.current.play().catch(() => {});
           }
           
-          // Decrease lives
           setGameState(prev => {
             const newLives = prev.lives - 1;
             const gameOver = newLives <= 0;
             
-            // Update high score if needed
             if (gameOver && prev.score > prev.highScore) {
               localStorage.setItem('pacmanHighScore', prev.score.toString());
             }
@@ -255,7 +227,6 @@ const GameBoard: React.FC = () => {
           });
           
           if (gameState.lives > 1) {
-            // Reset positions but keep maze state
             setPacmanPosition({...INITIAL_PACMAN_POSITION});
             setPacmanDirection('none');
             setQueuedDirection('none');
@@ -272,7 +243,6 @@ const GameBoard: React.FC = () => {
               }))
             );
             
-            // Pause game briefly
             setGameState(prev => ({ ...prev, gamePaused: true }));
             
             setTimeout(() => {
@@ -284,17 +254,14 @@ const GameBoard: React.FC = () => {
     }
   }, [ghosts, pacmanPosition, gameState.lives]);
   
-  // Game loop
   const gameLoop = useCallback(() => {
     if (gameState.gamePaused || gameState.gameOver || !gameState.gameStarted) {
       return;
     }
     
-    // Move pacman if there's a direction
     if (pacmanDirection !== 'none') {
       setIsMoving(true);
       
-      // Try to move in queued direction first if it exists
       if (queuedDirection !== 'none' && isValidMove(maze, pacmanPosition, queuedDirection)) {
         setPacmanDirection(queuedDirection);
         setQueuedDirection('none');
@@ -302,13 +269,11 @@ const GameBoard: React.FC = () => {
         setPacmanPosition(newPosition);
         consumePellet(newPosition);
       } 
-      // Otherwise continue in current direction if possible
       else if (isValidMove(maze, pacmanPosition, pacmanDirection)) {
         const newPosition = getNextPosition(pacmanPosition, pacmanDirection);
         setPacmanPosition(newPosition);
         consumePellet(newPosition);
       }
-      // If we can't move in current direction, try queued direction
       else if (queuedDirection !== 'none' && isValidMove(maze, pacmanPosition, queuedDirection)) {
         setPacmanDirection(queuedDirection);
         setQueuedDirection('none');
@@ -320,12 +285,9 @@ const GameBoard: React.FC = () => {
       }
     }
     
-    // Check ghost collisions
     checkGhostCollisions();
-    
   }, [pacmanDirection, queuedDirection, pacmanPosition, maze, consumePellet, checkGhostCollisions, gameState]);
   
-  // Ghost movement loop
   const moveGhosts = useCallback(() => {
     if (gameState.gamePaused || gameState.gameOver || !gameState.gameStarted) {
       return;
@@ -333,7 +295,6 @@ const GameBoard: React.FC = () => {
     
     setGhosts(prevGhosts => 
       prevGhosts.map(ghost => {
-        // Check if frightened state should end
         let newState = ghost.state;
         let newFrightenedTimer = ghost.frightenedTimer;
         
@@ -342,12 +303,9 @@ const GameBoard: React.FC = () => {
           newFrightenedTimer = null;
         }
         
-        // Special movement for Clyde (orange) and Inky (blue)
         if (ghost.type === 'clyde' && newState !== 'frightened') {
-          // Move Clyde in a circle around bottom right
           const nextTargetPosition = clydeCirclePath[clydePathIndex];
           
-          // If close to target, move to next point in path
           if (calculateDistance(ghost.position, nextTargetPosition) < 1) {
             setClydePathIndex(prev => (prev + 1) % clydeCirclePath.length);
           }
@@ -375,10 +333,8 @@ const GameBoard: React.FC = () => {
           };
         } 
         else if (ghost.type === 'inky' && newState !== 'frightened') {
-          // Move Inky in a circle around bottom left
           const nextTargetPosition = inkyCirclePath[inkyPathIndex];
           
-          // If close to target, move to next point in path
           if (calculateDistance(ghost.position, nextTargetPosition) < 1) {
             setInkyPathIndex(prev => (prev + 1) % inkyCirclePath.length);
           }
@@ -406,7 +362,6 @@ const GameBoard: React.FC = () => {
           };
         }
         else {
-          // Calculate target based on ghost type and state for other ghosts
           let targetPosition = ghost.targetPosition;
           
           if (newState === 'chase') {
@@ -417,7 +372,6 @@ const GameBoard: React.FC = () => {
               pacmanDirection
             );
           } else if (newState === 'frightened') {
-            // Random movement for frightened ghosts
             const validMoves = ['up', 'down', 'left', 'right'].filter(
               dir => dir !== ghost.direction && isValidMove(maze, ghost.position, dir as Direction)
             );
@@ -437,7 +391,6 @@ const GameBoard: React.FC = () => {
             }
           }
           
-          // Determine best direction to reach target
           const newDirection = getBestDirection(
             maze, 
             ghost.position, 
@@ -445,7 +398,6 @@ const GameBoard: React.FC = () => {
             ghost.direction
           );
           
-          // Move ghost
           let newPosition = ghost.position;
           if (isValidMove(maze, ghost.position, newDirection)) {
             newPosition = getNextPosition(ghost.position, newDirection);
@@ -464,16 +416,12 @@ const GameBoard: React.FC = () => {
       })
     );
     
-    // Check for collisions after ghosts move
     checkGhostCollisions();
-    
   }, [maze, pacmanPosition, pacmanDirection, checkGhostCollisions, gameState, clydePathIndex, inkyPathIndex]);
   
-  // Handle keyboard controls
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (gameState.gameOver) return;
     
-    // Start game if not started
     if (!gameState.gameStarted) {
       setGameState(prev => ({ ...prev, gameStarted: true }));
     }
@@ -521,7 +469,6 @@ const GameBoard: React.FC = () => {
         break;
       case 'p':
       case 'P':
-        // Toggle pause
         setGameState(prev => ({ 
           ...prev, 
           gamePaused: !prev.gamePaused
@@ -532,11 +479,9 @@ const GameBoard: React.FC = () => {
     }
   }, [maze, pacmanPosition, gameState.gameStarted, gameState.gameOver, gameState.gamePaused]);
   
-  // Handle touch/click controls
   const handleDirectionClick = useCallback((direction: Direction) => {
     if (gameState.gameOver) return;
     
-    // Start game if not started
     if (!gameState.gameStarted) {
       setGameState(prev => ({ ...prev, gameStarted: true }));
     }
@@ -548,7 +493,6 @@ const GameBoard: React.FC = () => {
     }
   }, [maze, pacmanPosition, gameState.gameStarted, gameState.gameOver]);
   
-  // Reset game state
   const resetGame = useCallback((fullReset: boolean = true) => {
     setPacmanPosition({...INITIAL_PACMAN_POSITION});
     setPacmanDirection('none');
@@ -577,21 +521,16 @@ const GameBoard: React.FC = () => {
     }));
   }, []);
   
-  // Set up event listeners and game loops
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     
-    // Start game loops when game starts
     if (gameState.gameStarted && !gameState.gamePaused && !gameState.gameOver) {
-      // Clear existing intervals
       if (gameLoopRef.current) clearInterval(gameLoopRef.current);
       if (ghostLoopRef.current) clearInterval(ghostLoopRef.current);
       
-      // Set new intervals
       gameLoopRef.current = setInterval(gameLoop, GAME_SPEED);
       ghostLoopRef.current = setInterval(moveGhosts, GHOST_SPEED);
     } else {
-      // Clear intervals when game is not active
       if (gameLoopRef.current) clearInterval(gameLoopRef.current);
       if (ghostLoopRef.current) clearInterval(ghostLoopRef.current);
     }
@@ -606,7 +545,6 @@ const GameBoard: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center w-full">
       <div className="relative game-container">
-        {/* Game board */}
         <div 
           className="relative bg-black"
           style={{ 
@@ -614,7 +552,6 @@ const GameBoard: React.FC = () => {
             height: MAZE_HEIGHT * CELL_SIZE 
           }}
         >
-          {/* Render maze cells */}
           {maze.map((row, y) => (
             <div key={`row-${y}`} className="flex">
               {row.map((cell, x) => (
@@ -623,7 +560,6 @@ const GameBoard: React.FC = () => {
             </div>
           ))}
           
-          {/* Render Pacman */}
           <Pacman 
             position={pacmanPosition} 
             direction={pacmanDirection} 
@@ -631,7 +567,6 @@ const GameBoard: React.FC = () => {
             isMoving={isMoving}
           />
           
-          {/* Render Ghosts */}
           {ghosts.map((ghost) => (
             <Ghost 
               key={ghost.type} 
@@ -640,7 +575,6 @@ const GameBoard: React.FC = () => {
             />
           ))}
           
-          {/* Overlay for not started game */}
           {!gameState.gameStarted && !gameState.gameOver && (
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center z-40">
               <h2 className="text-white text-4xl font-bold mb-8 game-title">PAC-MAN</h2>
@@ -653,7 +587,6 @@ const GameBoard: React.FC = () => {
             </div>
           )}
           
-          {/* Pause overlay */}
           {gameState.gamePaused && gameState.gameStarted && !gameState.gameOver && (
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-40">
               <div className="glass-panel p-8 text-center">
@@ -668,10 +601,8 @@ const GameBoard: React.FC = () => {
             </div>
           )}
           
-          {/* Game controls overlay for mobile */}
           <GameControls onDirectionClick={handleDirectionClick} />
           
-          {/* Game over screen */}
           {gameState.gameOver && (
             <GameOver 
               score={gameState.score} 
@@ -681,7 +612,6 @@ const GameBoard: React.FC = () => {
           )}
         </div>
         
-        {/* Score display */}
         <div className="glass-panel mt-4 p-4 w-full flex items-center justify-between">
           <div className="flex flex-col items-start">
             <span className="text-xs text-white/70">SCORE</span>
