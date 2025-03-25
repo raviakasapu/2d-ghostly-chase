@@ -29,6 +29,20 @@ const GAME_SPEED = 150; // ms per tick
 const GHOST_SPEED = 175; // ms per ghost move
 const FRIGHTENED_TIME = 8000; // 8 seconds
 
+const clydeCirclePath = [
+  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 4 }, // bottom right area
+  { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 4 },
+  { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 },
+  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 2 },
+];
+
+const inkyCirclePath = [
+  { x: 2, y: MAZE_HEIGHT - 4 }, // bottom left area
+  { x: 4, y: MAZE_HEIGHT - 4 },
+  { x: 4, y: MAZE_HEIGHT - 2 },
+  { x: 2, y: MAZE_HEIGHT - 2 },
+];
+
 const GameBoard: React.FC = () => {
   // Game state
   const [gameState, setGameState] = useState<GameState>({
@@ -87,6 +101,10 @@ const GameBoard: React.FC = () => {
       targetPosition: { x: 0, y: MAZE_HEIGHT - 1 }
     }
   ]);
+  
+  // Path indices for Clyde and Inky
+  const [clydePathIndex, setClydePathIndex] = useState(0);
+  const [inkyPathIndex, setInkyPathIndex] = useState(0);
   
   // Game timers
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
@@ -160,7 +178,7 @@ const GameBoard: React.FC = () => {
         prevGhosts.map(ghost => ({
           ...ghost,
           state: 'frightened',
-          frightenedTimer: Date.now() + FRIGHTENED_TIME
+          frightenedTimer: null
         }))
       );
     }
@@ -322,67 +340,132 @@ const GameBoard: React.FC = () => {
           newFrightenedTimer = null;
         }
         
-        // Calculate target based on ghost type and state
-        let targetPosition = ghost.targetPosition;
-        
-        if (newState === 'chase') {
-          targetPosition = calculateGhostTarget(
-            ghost.type, 
+        // Special movement for Clyde (orange) and Inky (blue)
+        if (ghost.type === 'clyde' && newState !== 'frightened') {
+          // Move Clyde in a circle around bottom right
+          const nextTargetPosition = clydeCirclePath[clydePathIndex];
+          
+          // If close to target, move to next point in path
+          if (calculateDistance(ghost.position, nextTargetPosition) < 1) {
+            setClydePathIndex(prev => (prev + 1) % clydeCirclePath.length);
+          }
+          
+          const newDirection = getBestDirection(
+            maze, 
             ghost.position, 
-            pacmanPosition, 
-            pacmanDirection
-          );
-        } else if (newState === 'frightened') {
-          // Random movement for frightened ghosts
-          const validMoves = ['up', 'down', 'left', 'right'].filter(
-            dir => dir !== ghost.direction && isValidMove(maze, ghost.position, dir as Direction)
+            nextTargetPosition, 
+            ghost.direction
           );
           
-          if (validMoves.length > 0) {
-            const randomDir = validMoves[Math.floor(Math.random() * validMoves.length)] as Direction;
-            const newPosition = getNextPosition(ghost.position, randomDir);
-            
-            return {
-              ...ghost,
-              position: newPosition,
-              direction: randomDir,
-              nextDirection: randomDir,
-              state: newState,
-              frightenedTimer: newFrightenedTimer
-            };
+          let newPosition = ghost.position;
+          if (isValidMove(maze, ghost.position, newDirection)) {
+            newPosition = getNextPosition(ghost.position, newDirection);
           }
+          
+          return {
+            ...ghost,
+            position: newPosition,
+            direction: newDirection,
+            nextDirection: newDirection,
+            targetPosition: nextTargetPosition,
+            state: newState,
+            frightenedTimer: newFrightenedTimer
+          };
+        } 
+        else if (ghost.type === 'inky' && newState !== 'frightened') {
+          // Move Inky in a circle around bottom left
+          const nextTargetPosition = inkyCirclePath[inkyPathIndex];
+          
+          // If close to target, move to next point in path
+          if (calculateDistance(ghost.position, nextTargetPosition) < 1) {
+            setInkyPathIndex(prev => (prev + 1) % inkyCirclePath.length);
+          }
+          
+          const newDirection = getBestDirection(
+            maze, 
+            ghost.position, 
+            nextTargetPosition, 
+            ghost.direction
+          );
+          
+          let newPosition = ghost.position;
+          if (isValidMove(maze, ghost.position, newDirection)) {
+            newPosition = getNextPosition(ghost.position, newDirection);
+          }
+          
+          return {
+            ...ghost,
+            position: newPosition,
+            direction: newDirection,
+            nextDirection: newDirection,
+            targetPosition: nextTargetPosition,
+            state: newState,
+            frightenedTimer: newFrightenedTimer
+          };
         }
-        
-        // Determine best direction to reach target
-        const newDirection = getBestDirection(
-          maze, 
-          ghost.position, 
-          targetPosition, 
-          ghost.direction
-        );
-        
-        // Move ghost
-        let newPosition = ghost.position;
-        if (isValidMove(maze, ghost.position, newDirection)) {
-          newPosition = getNextPosition(ghost.position, newDirection);
+        else {
+          // Calculate target based on ghost type and state for other ghosts
+          let targetPosition = ghost.targetPosition;
+          
+          if (newState === 'chase') {
+            targetPosition = calculateGhostTarget(
+              ghost.type, 
+              ghost.position, 
+              pacmanPosition, 
+              pacmanDirection
+            );
+          } else if (newState === 'frightened') {
+            // Random movement for frightened ghosts
+            const validMoves = ['up', 'down', 'left', 'right'].filter(
+              dir => dir !== ghost.direction && isValidMove(maze, ghost.position, dir as Direction)
+            );
+            
+            if (validMoves.length > 0) {
+              const randomDir = validMoves[Math.floor(Math.random() * validMoves.length)] as Direction;
+              const newPosition = getNextPosition(ghost.position, randomDir);
+              
+              return {
+                ...ghost,
+                position: newPosition,
+                direction: randomDir,
+                nextDirection: randomDir,
+                state: newState,
+                frightenedTimer: newFrightenedTimer
+              };
+            }
+          }
+          
+          // Determine best direction to reach target
+          const newDirection = getBestDirection(
+            maze, 
+            ghost.position, 
+            targetPosition, 
+            ghost.direction
+          );
+          
+          // Move ghost
+          let newPosition = ghost.position;
+          if (isValidMove(maze, ghost.position, newDirection)) {
+            newPosition = getNextPosition(ghost.position, newDirection);
+          }
+          
+          return {
+            ...ghost,
+            position: newPosition,
+            direction: newDirection,
+            nextDirection: newDirection,
+            targetPosition: targetPosition,
+            state: newState,
+            frightenedTimer: newFrightenedTimer
+          };
         }
-        
-        return {
-          ...ghost,
-          position: newPosition,
-          direction: newDirection,
-          nextDirection: newDirection,
-          targetPosition: targetPosition,
-          state: newState,
-          frightenedTimer: newFrightenedTimer
-        };
       })
     );
     
     // Check for collisions after ghosts move
     checkGhostCollisions();
     
-  }, [maze, pacmanPosition, pacmanDirection, checkGhostCollisions, gameState]);
+  }, [maze, pacmanPosition, pacmanDirection, checkGhostCollisions, gameState, clydePathIndex, inkyPathIndex]);
   
   // Handle keyboard controls
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -516,7 +599,7 @@ const GameBoard: React.FC = () => {
       if (gameLoopRef.current) clearInterval(gameLoopRef.current);
       if (ghostLoopRef.current) clearInterval(ghostLoopRef.current);
     };
-  }, [handleKeyDown, gameLoop, moveGhosts, gameState.gameStarted, gameState.gamePaused, gameState.gameOver]);
+  }, [handleKeyDown, gameLoop, moveGhosts, gameState.gameStarted, gameState.gamePaused, gameState.gameOver, clydePathIndex, inkyPathIndex]);
   
   return (
     <div className="flex flex-col items-center justify-center w-full">

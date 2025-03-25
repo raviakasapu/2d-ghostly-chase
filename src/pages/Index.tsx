@@ -8,7 +8,7 @@ const Index = () => {
       {/* Header Section */}
       <header className="py-4 px-6 flex justify-center">
         <h1 className="text-4xl md:text-5xl font-bold game-title">
-          PAC<span className="text-game-pacman">-</span>MAN
+          PAC-MAN
         </h1>
       </header>
 
