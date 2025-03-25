@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect } from 'react';
 import Cell from './Cell';
 import Pacman from './Pacman';
