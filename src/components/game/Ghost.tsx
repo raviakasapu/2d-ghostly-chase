@@ -16,10 +16,21 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
     ? 'ghost-frightened' 
     : `ghost-${type}`;
   
-  // Add rotation for Clyde (orange ghost)
-  const isClyde = type === 'clyde';
-  const rotation = isClyde ? 'animate-spin' : '';
-  const rotationDuration = isClyde ? 'animation-duration: 4s' : '';
+  // Add rotation for ghosts
+  let rotation = '';
+  let rotationDuration = '';
+  
+  // Clyde (orange) rotates clockwise
+  if (type === 'clyde') {
+    rotation = 'animate-spin';
+    rotationDuration = 'animation-duration: 4s';
+  }
+  
+  // Inky (blue) rotates counter-clockwise
+  if (type === 'inky') {
+    rotation = 'animate-spin-reverse';
+    rotationDuration = 'animation-duration: 5s';
+  }
   
   return (
     <div

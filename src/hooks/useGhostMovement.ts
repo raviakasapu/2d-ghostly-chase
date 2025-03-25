@@ -20,11 +20,18 @@ import {
 const GHOST_SPEED = 175; // ms per ghost move
 
 // Define ghost path constants
-const clydeCirclePath = [
-  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 4 }, // bottom right area
-  { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 4 },
-  { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 },
-  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 2 },
+const blinkyCirclePath = [
+  { x: 2, y: 2 }, // top left area
+  { x: 4, y: 2 },
+  { x: 4, y: 4 },
+  { x: 2, y: 4 },
+];
+
+const pinkyCirclePath = [
+  { x: MAZE_WIDTH - 4, y: 2 }, // top right area
+  { x: MAZE_WIDTH - 2, y: 2 },
+  { x: MAZE_WIDTH - 2, y: 4 },
+  { x: MAZE_WIDTH - 4, y: 4 },
 ];
 
 const inkyCirclePath = [
@@ -32,6 +39,13 @@ const inkyCirclePath = [
   { x: 4, y: MAZE_HEIGHT - 4 },
   { x: 4, y: MAZE_HEIGHT - 2 },
   { x: 2, y: MAZE_HEIGHT - 2 },
+];
+
+const clydeCirclePath = [
+  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 4 }, // bottom right area
+  { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 4 },
+  { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 },
+  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 2 },
 ];
 
 export const useGhostMovement = (
@@ -84,8 +98,10 @@ export const useGhostMovement = (
     }
   ]);
   
-  const [clydePathIndex, setClydePathIndex] = useState(0);
+  const [blinkyPathIndex, setBlinkyPathIndex] = useState(0);
+  const [pinkyPathIndex, setPinkyPathIndex] = useState(0);
   const [inkyPathIndex, setInkyPathIndex] = useState(0);
+  const [clydePathIndex, setClydePathIndex] = useState(0);
   
   const ghostLoopRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -135,11 +151,33 @@ export const useGhostMovement = (
           newFrightenedTimer = null;
         }
         
-        if (ghost.type === 'clyde' && newState !== 'frightened') {
-          const nextTargetPosition = clydeCirclePath[clydePathIndex];
+        // Different behavior based on ghost type
+        if (newState !== 'frightened') {
+          let nextTargetPosition;
+          let pathIndex;
+          let setPathIndex;
+          
+          // Determine which path to follow based on ghost type
+          if (ghost.type === 'blinky') {
+            nextTargetPosition = blinkyCirclePath[blinkyPathIndex];
+            pathIndex = blinkyPathIndex;
+            setPathIndex = setBlinkyPathIndex;
+          } else if (ghost.type === 'pinky') {
+            nextTargetPosition = pinkyCirclePath[pinkyPathIndex];
+            pathIndex = pinkyPathIndex;
+            setPathIndex = setPinkyPathIndex;
+          } else if (ghost.type === 'inky') {
+            nextTargetPosition = inkyCirclePath[inkyPathIndex];
+            pathIndex = inkyPathIndex;
+            setPathIndex = setInkyPathIndex;
+          } else { // clyde
+            nextTargetPosition = clydeCirclePath[clydePathIndex];
+            pathIndex = clydePathIndex;
+            setPathIndex = setClydePathIndex;
+          }
           
           if (calculateDistance(ghost.position, nextTargetPosition) < 1) {
-            setClydePathIndex(prev => (prev + 1) % clydeCirclePath.length);
+            setPathIndex((prev: number) => (prev + 1) % 4);
           }
           
           const newDirection = getBestDirection(
@@ -163,70 +201,31 @@ export const useGhostMovement = (
             state: newState,
             frightenedTimer: newFrightenedTimer
           };
-        } 
-        else if (ghost.type === 'inky' && newState !== 'frightened') {
-          const nextTargetPosition = inkyCirclePath[inkyPathIndex];
-          
-          if (calculateDistance(ghost.position, nextTargetPosition) < 1) {
-            setInkyPathIndex(prev => (prev + 1) % inkyCirclePath.length);
-          }
-          
-          const newDirection = getBestDirection(
-            maze, 
-            ghost.position, 
-            nextTargetPosition, 
-            ghost.direction
+        } else {
+          // Frightened state handling - random movement
+          const validMoves = ['up', 'down', 'left', 'right'].filter(
+            dir => dir !== ghost.direction && isValidMove(maze, ghost.position, dir as Direction)
           );
           
-          let newPosition = ghost.position;
-          if (isValidMove(maze, ghost.position, newDirection)) {
-            newPosition = getNextPosition(ghost.position, newDirection);
-          }
-          
-          return {
-            ...ghost,
-            position: newPosition,
-            direction: newDirection,
-            nextDirection: newDirection,
-            targetPosition: nextTargetPosition,
-            state: newState,
-            frightenedTimer: newFrightenedTimer
-          };
-        }
-        else {
-          let targetPosition = ghost.targetPosition;
-          
-          if (newState === 'chase') {
-            targetPosition = calculateGhostTarget(
-              ghost.type, 
-              ghost.position, 
-              pacmanPosition, 
-              pacmanDirection
-            );
-          } else if (newState === 'frightened') {
-            const validMoves = ['up', 'down', 'left', 'right'].filter(
-              dir => dir !== ghost.direction && isValidMove(maze, ghost.position, dir as Direction)
-            );
+          if (validMoves.length > 0) {
+            const randomDir = validMoves[Math.floor(Math.random() * validMoves.length)] as Direction;
+            const newPosition = getNextPosition(ghost.position, randomDir);
             
-            if (validMoves.length > 0) {
-              const randomDir = validMoves[Math.floor(Math.random() * validMoves.length)] as Direction;
-              const newPosition = getNextPosition(ghost.position, randomDir);
-              
-              return {
-                ...ghost,
-                position: newPosition,
-                direction: randomDir,
-                nextDirection: randomDir,
-                state: newState,
-                frightenedTimer: newFrightenedTimer
-              };
-            }
+            return {
+              ...ghost,
+              position: newPosition,
+              direction: randomDir,
+              nextDirection: randomDir,
+              state: newState,
+              frightenedTimer: newFrightenedTimer
+            };
           }
           
+          // If no valid random moves, use best direction to current target
           const newDirection = getBestDirection(
             maze, 
             ghost.position, 
-            targetPosition, 
+            ghost.targetPosition, 
             ghost.direction
           );
           
@@ -240,7 +239,6 @@ export const useGhostMovement = (
             position: newPosition,
             direction: newDirection,
             nextDirection: newDirection,
-            targetPosition: targetPosition,
             state: newState,
             frightenedTimer: newFrightenedTimer
           };
@@ -254,9 +252,11 @@ export const useGhostMovement = (
     pacmanPosition, 
     pacmanDirection, 
     checkGhostCollisions, 
-    gameState, 
-    clydePathIndex, 
-    inkyPathIndex
+    gameState,
+    blinkyPathIndex,
+    pinkyPathIndex,
+    inkyPathIndex,
+    clydePathIndex
   ]);
   
   useEffect(() => {
