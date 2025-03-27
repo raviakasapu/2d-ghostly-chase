@@ -13,16 +13,15 @@ const Index = () => {
       </header>
 
       {/* Main Game Area */}
-      <main className="flex-1 flex items-center justify-center p-4">
+      <main className="flex-1 flex items-center justify-center p-4 pb-2">
         <div className="w-full flex justify-center">
           <GameBoard />
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="glass-panel mx-4 md:mx-auto mt-4 mb-6 max-w-xl p-4 text-center text-sm text-white/60">
-        <p>Use arrow keys or on-screen controls to move Pac-Man</p>
-        <p>Collect all pellets to advance to the next level</p>
+      {/* Footer - Removing glass panel and making it more compact */}
+      <footer className="mx-4 md:mx-auto mb-2 max-w-xl p-1 text-center text-sm text-white/60">
+        <p className="text-xs">Use arrow keys or on-screen controls to move Pac-Man</p>
       </footer>
     </div>
   );
