@@ -7,8 +7,15 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-gray-950 text-white">
       {/* Header Section - Making it even more compact */}
       <header className="py-1 px-6 flex justify-center">
-        <h1 className="text-3xl md:text-4xl font-bold game-title">
-          PAC-MAN
+        <h1 className="text-3xl md:text-4xl font-bold game-title flex items-center">
+          PA
+          <span className="inline-block relative mx-[-2px]">
+            <div 
+              className="pacman-logo w-8 h-8 md:w-10 md:h-10"
+              style={{ transform: 'rotate(0deg)' }}
+            ></div>
+          </span>
+          -MAN
         </h1>
       </header>
 

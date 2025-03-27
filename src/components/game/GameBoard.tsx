@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect } from 'react';
 import Cell from './Cell';
 import Pacman from './Pacman';
@@ -126,7 +125,6 @@ const GameBoard: React.FC = () => {
           
           {!gameState.gameStarted && !gameState.gameOver && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-40">
-              <h2 className="text-white text-3xl font-bold mb-4 game-title">PAC-MAN</h2>
               <button 
                 className="primary-btn px-6 py-3 text-lg"
                 onClick={() => setGameState(prev => ({ ...prev, gameStarted: true }))}

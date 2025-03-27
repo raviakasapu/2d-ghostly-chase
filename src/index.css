@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -102,6 +103,11 @@
 }
 
 @layer components {
+  .pacman-logo {
+    @apply bg-game-pacman relative rounded-full;
+    clip-path: polygon(50% 50%, 100% 0, 100% 25%, 100% 75%, 100% 100%, 0 100%, 0 0);
+  }
+
   .game-container {
     background-color: #000;
     max-width: 100%;
