@@ -11,7 +11,7 @@ const Index = () => {
           PA
           <span className="inline-block relative mx-[-2px]">
             <div 
-              className="pacman-logo w-8 h-8 md:w-10 md:h-10"
+              className="pacman-logo w-6 h-6 md:w-8 md:h-8"
               style={{ transform: 'rotate(90deg)' }}
             ></div>
           </span>
