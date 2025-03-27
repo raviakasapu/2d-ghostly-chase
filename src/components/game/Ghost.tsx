@@ -16,31 +16,14 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
     ? 'ghost-frightened' 
     : `ghost-${type}`;
   
-  // Add rotation for ghosts
-  let rotation = '';
-  let rotationDuration = '';
-  
-  // Clyde (orange) rotates clockwise
-  if (type === 'clyde') {
-    rotation = 'animate-spin';
-    rotationDuration = 'animation-duration: 4s';
-  }
-  
-  // Inky (blue) rotates counter-clockwise
-  if (type === 'inky') {
-    rotation = 'animate-spin-reverse';
-    rotationDuration = 'animation-duration: 5s';
-  }
-  
   return (
     <div
-      className={`ghost ${ghostColor} absolute ${rotation}`}
+      className={`ghost ${ghostColor} absolute`}
       style={{
         width: size,
         height: size,
         left: position.x * size,
         top: position.y * size,
-        ...(rotationDuration ? { style: rotationDuration } : {})
       }}
     >
       {/* Ghost body - more rounded with proper ghost shape */}
