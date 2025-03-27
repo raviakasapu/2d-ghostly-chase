@@ -13,10 +13,10 @@ const Pacman: React.FC<PacmanProps> = ({ position, direction, size, isMoving }) 
   // Determine rotation based on direction
   const getRotation = () => {
     switch (direction) {
-      case 'right': return 0;
-      case 'down': return 90;
-      case 'left': return 180;
-      case 'up': return 270;
+      case 'right': return 0;     // 0 degrees - facing right
+      case 'down': return 90;     // 90 degrees - facing down
+      case 'left': return 180;    // 180 degrees - facing left
+      case 'up': return 270;      // 270 degrees - facing up
       default: return 0;
     }
   };
