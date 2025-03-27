@@ -61,10 +61,11 @@ export const usePlayerMovement = (initialPosition: Position) => {
     
     // Only process direction changes
     if (direction !== 'none') {
-      if (isValidMove(maze, pacmanPosition, direction)) {
-        setPacmanDirection(direction);
-        setIsMoving(true);
-      } else {
+      setPacmanDirection(direction);
+      setIsMoving(true);
+      
+      // Only queue the direction if it's not a valid move
+      if (!isValidMove(maze, pacmanPosition, direction)) {
         setQueuedDirection(direction);
       }
     }
@@ -82,10 +83,10 @@ export const usePlayerMovement = (initialPosition: Position) => {
       setGameState(prev => ({ ...prev, gameStarted: true }));
     }
     
-    if (isValidMove(maze, pacmanPosition, direction)) {
-      setPacmanDirection(direction);
-      setIsMoving(true);
-    } else {
+    setPacmanDirection(direction);
+    setIsMoving(true);
+    
+    if (!isValidMove(maze, pacmanPosition, direction)) {
       setQueuedDirection(direction);
     }
   }, [pacmanPosition]);
