@@ -10,7 +10,6 @@ import {
   MAZE_WIDTH, 
   MAZE_HEIGHT,
 } from '../../utils/gameUtils';
-import GameControls from './GameControls';
 import GameOver from './GameOver';
 import GameUI from './GameUI';
 import { useGameLogic } from '../../hooks/useGameLogic';
@@ -93,9 +92,9 @@ const GameBoard: React.FC = () => {
   
   return (
     <div className="flex flex-col items-center justify-center w-full">
-      <div className="relative game-container">
+      <div className="relative game-container overflow-visible">
         <div 
-          className="relative bg-black"
+          className="relative"
           style={{ 
             width: MAZE_WIDTH * CELL_SIZE, 
             height: MAZE_HEIGHT * CELL_SIZE 
@@ -125,10 +124,9 @@ const GameBoard: React.FC = () => {
           ))}
           
           {!gameState.gameStarted && !gameState.gameOver && (
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center z-40">
-              <h2 className="text-white text-4xl font-bold mb-8 game-title">PAC-MAN</h2>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-40">
               <button 
-                className="primary-btn px-8 py-4 text-xl"
+                className="primary-btn px-6 py-3 text-lg"
                 onClick={() => setGameState(prev => ({ ...prev, gameStarted: true }))}
               >
                 Start Game
@@ -137,7 +135,7 @@ const GameBoard: React.FC = () => {
           )}
           
           {gameState.gamePaused && gameState.gameStarted && !gameState.gameOver && (
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-40">
+            <div className="absolute inset-0 flex items-center justify-center z-40">
               <div className="glass-panel p-8 text-center">
                 <h2 className="text-white text-3xl font-bold mb-4">PAUSED</h2>
                 <button 
@@ -149,8 +147,6 @@ const GameBoard: React.FC = () => {
               </div>
             </div>
           )}
-          
-          <GameControls onDirectionClick={handleDirectionClick} />
           
           {gameState.gameOver && (
             <GameOver 

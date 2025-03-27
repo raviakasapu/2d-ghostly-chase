@@ -102,13 +102,19 @@
 }
 
 @layer components {
+  .pacman-logo {
+    @apply bg-game-pacman relative rounded-full;
+    clip-path: polygon(50% 50%, 100% 0, 100% 25%, 100% 75%, 100% 100%, 0 100%, 0 0);
+  }
+
   .game-container {
     background-color: #000;
     max-width: 100%;
-    max-height: 100vh;
-    aspect-ratio: 1 / 1;
+    max-height: 90vh;
+    aspect-ratio: auto;
     @apply relative overflow-hidden rounded-lg shadow-xl;
     @apply transition-all duration-300 ease-in-out;
+    margin-bottom: 10px;
   }
 
   .pacman {
@@ -252,9 +258,18 @@
 }
 
 @keyframes chomp {
-  0% { clip-path: polygon(50% 50%, 100% 0, 100% 25%, 100% 75%, 100% 100%, 0 100%, 0 0); }
-  50% { clip-path: polygon(50% 50%, 100% 25%, 100% 75%, 0% 75%, 0% 25%); }
-  100% { clip-path: polygon(50% 50%, 100% 0, 100% 25%, 100% 75%, 100% 100%, 0 100%, 0 0); }
+  0%, 100% {
+    clip-path: polygon(
+      50% 50%,      /* center point */
+      100% 0%,      /* top right */
+      100% 100%,    /* bottom right */
+      0% 100%,      /* bottom left */
+      0% 0%         /* top left */
+    );
+  }
+  50% {
+    clip-path: circle(50% at 50% 50%);  /* Full circle when mouth closes */
+  }
 }
 
 .animate-chomp {
