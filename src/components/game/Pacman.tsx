@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Direction, Position } from '../../types/game';
-import { DIRECTION_DEGREES } from '../../utils/gameUtils';
 
 interface PacmanProps {
   position: Position;
