@@ -11,7 +11,6 @@ import {
   MAZE_WIDTH, 
   MAZE_HEIGHT,
 } from '../../utils/gameUtils';
-import GameControls from './GameControls';
 import GameOver from './GameOver';
 import GameUI from './GameUI';
 import { useGameLogic } from '../../hooks/useGameLogic';
@@ -126,7 +125,7 @@ const GameBoard: React.FC = () => {
           ))}
           
           {!gameState.gameStarted && !gameState.gameOver && (
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center z-40">
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-40">
               <h2 className="text-white text-4xl font-bold mb-8 game-title">PAC-MAN</h2>
               <button 
                 className="primary-btn px-8 py-4 text-xl"
@@ -138,7 +137,7 @@ const GameBoard: React.FC = () => {
           )}
           
           {gameState.gamePaused && gameState.gameStarted && !gameState.gameOver && (
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-40">
+            <div className="absolute inset-0 flex items-center justify-center z-40">
               <div className="glass-panel p-8 text-center">
                 <h2 className="text-white text-3xl font-bold mb-4">PAUSED</h2>
                 <button 
@@ -150,8 +149,6 @@ const GameBoard: React.FC = () => {
               </div>
             </div>
           )}
-          
-          <GameControls onDirectionClick={handleDirectionClick} />
           
           {gameState.gameOver && (
             <GameOver 
