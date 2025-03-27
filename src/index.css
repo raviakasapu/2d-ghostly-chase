@@ -268,13 +268,7 @@
     );
   }
   50% {
-    clip-path: polygon(
-      50% 50%,      /* center point */
-      100% 35%,     /* mid-top right */
-      100% 65%,     /* mid-bottom right */
-      0% 65%,       /* mid-bottom left */
-      0% 35%        /* mid-top left */
-    );
+    clip-path: circle(50% at 50% 50%);  /* Full circle when mouth closes */
   }
 }
 
