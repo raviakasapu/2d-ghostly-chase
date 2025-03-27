@@ -18,11 +18,6 @@ const Index = () => {
           <GameBoard />
         </div>
       </main>
-
-      {/* Footer - Removing glass panel and making it more compact */}
-      <footer className="mx-4 md:mx-auto mb-2 max-w-xl p-1 text-center text-sm text-white/60">
-        <p className="text-xs">Use arrow keys to move Pac-Man</p>
-      </footer>
     </div>
   );
 };
