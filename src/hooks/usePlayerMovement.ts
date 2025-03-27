@@ -21,46 +21,32 @@ export const usePlayerMovement = (initialPosition: Position) => {
       setGameState(prev => ({ ...prev, gameStarted: true }));
     }
     
+    let direction: Direction = 'none';
+    
     switch (e.key) {
       case 'ArrowUp':
       case 'w':
       case 'W':
         e.preventDefault();
-        if (isValidMove(maze, pacmanPosition, 'up')) {
-          setPacmanDirection('up');
-        } else {
-          setQueuedDirection('up');
-        }
+        direction = 'up';
         break;
       case 'ArrowDown':
       case 's':
       case 'S':
         e.preventDefault();
-        if (isValidMove(maze, pacmanPosition, 'down')) {
-          setPacmanDirection('down');
-        } else {
-          setQueuedDirection('down');
-        }
+        direction = 'down';
         break;
       case 'ArrowLeft':
       case 'a':
       case 'A':
         e.preventDefault();
-        if (isValidMove(maze, pacmanPosition, 'left')) {
-          setPacmanDirection('left');
-        } else {
-          setQueuedDirection('left');
-        }
+        direction = 'left';
         break;
       case 'ArrowRight':
       case 'd':
       case 'D':
         e.preventDefault();
-        if (isValidMove(maze, pacmanPosition, 'right')) {
-          setPacmanDirection('right');
-        } else {
-          setQueuedDirection('right');
-        }
+        direction = 'right';
         break;
       case 'p':
       case 'P':
@@ -70,7 +56,17 @@ export const usePlayerMovement = (initialPosition: Position) => {
         }));
         break;
       default:
-        break;
+        return; // Exit if the key isn't relevant
+    }
+    
+    // Only process direction changes
+    if (direction !== 'none') {
+      if (isValidMove(maze, pacmanPosition, direction)) {
+        setPacmanDirection(direction);
+        setIsMoving(true);
+      } else {
+        setQueuedDirection(direction);
+      }
     }
   }, [pacmanPosition]);
   
@@ -88,6 +84,7 @@ export const usePlayerMovement = (initialPosition: Position) => {
     
     if (isValidMove(maze, pacmanPosition, direction)) {
       setPacmanDirection(direction);
+      setIsMoving(true);
     } else {
       setQueuedDirection(direction);
     }
@@ -105,6 +102,7 @@ export const usePlayerMovement = (initialPosition: Position) => {
     if (pacmanDirection !== 'none') {
       setIsMoving(true);
       
+      // Check if queued direction is now valid
       if (queuedDirection !== 'none' && isValidMove(maze, pacmanPosition, queuedDirection)) {
         setPacmanDirection(queuedDirection);
         setQueuedDirection('none');
@@ -112,18 +110,14 @@ export const usePlayerMovement = (initialPosition: Position) => {
         setPacmanPosition(newPosition);
         consumePellet(newPosition);
       } 
+      // Continue in current direction if valid
       else if (isValidMove(maze, pacmanPosition, pacmanDirection)) {
         const newPosition = getNextPosition(pacmanPosition, pacmanDirection);
         setPacmanPosition(newPosition);
         consumePellet(newPosition);
       }
-      else if (queuedDirection !== 'none' && isValidMove(maze, pacmanPosition, queuedDirection)) {
-        setPacmanDirection(queuedDirection);
-        setQueuedDirection('none');
-        const newPosition = getNextPosition(pacmanPosition, queuedDirection);
-        setPacmanPosition(newPosition);
-        consumePellet(newPosition);
-      } else {
+      // If we can't move, stop animation
+      else {
         setIsMoving(false);
       }
     }

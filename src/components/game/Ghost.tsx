@@ -16,26 +16,6 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
     ? 'ghost-frightened' 
     : `ghost-${type}`;
   
-  // Add a hint about the ghost's behavior
-  const getGhostBehaviorIcon = () => {
-    if (state === 'frightened') {
-      return '🏃';
-    }
-    
-    switch (type) {
-      case 'blinky':
-        return '🎯'; // Direct pursuit
-      case 'pinky':
-        return '⚡'; // Ambush
-      case 'inky':
-        return '👣'; // Patrol
-      case 'clyde':
-        return '🎲'; // Random
-      default:
-        return '';
-    }
-  };
-  
   return (
     <div
       className={`ghost ${ghostColor} absolute`}
@@ -48,11 +28,6 @@ const Ghost: React.FC<GhostProps> = ({ ghost, size }) => {
     >
       {/* Ghost body - more rounded with proper ghost shape */}
       <div className="ghost-body w-full h-3/4 rounded-t-full relative overflow-visible">
-        {/* Ghost behavior indicator */}
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 text-xs">
-          {getGhostBehaviorIcon()}
-        </div>
-        
         {/* Ghost bottom wavy part */}
         <div className="ghost-bottom absolute bottom-0 left-0 w-full h-1/4">
           <div className="flex h-full">
