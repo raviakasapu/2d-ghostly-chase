@@ -19,7 +19,7 @@ const Pacman: React.FC<PacmanProps> = ({ position, direction, size, isMoving }) 
         height: size,
         left: position.x * size,
         top: position.y * size,
-        transform: `rotate(${DIRECTION_DEGREES[direction]}deg)`,
+        transform: `rotate(0deg)`, // Always facing right
       }}
     >
       {/* Inner circle to create pacman shape */}
