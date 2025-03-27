@@ -10,42 +10,16 @@ interface PacmanProps {
 }
 
 const Pacman: React.FC<PacmanProps> = ({ position, direction, size, isMoving }) => {
-  // We'll apply custom CSS to create the mouth based on direction
-  const getMouthStyle = () => {
-    const baseStyle = {
-      width: '100%',
-      height: '100%',
-      backgroundColor: '#FFCC00',
-      borderRadius: '50%',
-      position: 'relative' as const,
-      overflow: 'hidden'
-    };
-
-    // Create a triangle cutout for the mouth
-    const afterStyle = {
-      content: '""',
-      position: 'absolute' as const,
-      width: '50%',
-      height: '50%',
-      backgroundColor: 'transparent'
-    };
-
-    // Position the mouth based on direction
-    const directionStyles = {
-      right: { ...afterStyle, right: 0, top: '25%', borderLeft: `${size/2}px solid black` },
-      left: { ...afterStyle, left: 0, top: '25%', borderRight: `${size/2}px solid black` },
-      up: { ...afterStyle, top: 0, left: '25%', borderBottom: `${size/2}px solid black` },
-      down: { ...afterStyle, bottom: 0, left: '25%', borderTop: `${size/2}px solid black` },
-      none: { ...afterStyle, display: 'none' }
-    };
-
-    return {
-      base: baseStyle,
-      mouth: directionStyles[direction] || directionStyles.right
-    };
+  // Determine rotation based on direction
+  const getRotation = () => {
+    switch (direction) {
+      case 'right': return 0;
+      case 'down': return 90;
+      case 'left': return 180;
+      case 'up': return 270;
+      default: return 0;
+    }
   };
-
-  const styles = getMouthStyle();
 
   return (
     <div
@@ -55,10 +29,13 @@ const Pacman: React.FC<PacmanProps> = ({ position, direction, size, isMoving }) 
         height: size,
         left: position.x * size,
         top: position.y * size,
+        transform: `rotate(${getRotation()}deg)`,
       }}
     >
-      <div style={styles.base}>
-        <div style={styles.mouth}></div>
+      {/* Inner circle to create pacman shape */}
+      <div className="absolute inset-0 bg-game-pacman rounded-full">
+        {/* Mouth animation is handled by CSS animations */}
+        <div className="pacman-mouth"></div>
       </div>
     </div>
   );
