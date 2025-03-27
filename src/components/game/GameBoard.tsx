@@ -1,3 +1,4 @@
+
 import React, { useCallback, useEffect } from 'react';
 import Cell from './Cell';
 import Pacman from './Pacman';
@@ -95,7 +96,7 @@ const GameBoard: React.FC = () => {
     <div className="flex flex-col items-center justify-center w-full">
       <div className="relative game-container">
         <div 
-          className="relative bg-black"
+          className="relative"
           style={{ 
             width: MAZE_WIDTH * CELL_SIZE, 
             height: MAZE_HEIGHT * CELL_SIZE 

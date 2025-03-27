@@ -14,7 +14,7 @@ const Index = () => {
 
       {/* Main Game Area */}
       <main className="flex-1 flex items-center justify-center p-4">
-        <div className="max-w-xl w-full">
+        <div className="w-full flex justify-center">
           <GameBoard />
         </div>
       </main>
