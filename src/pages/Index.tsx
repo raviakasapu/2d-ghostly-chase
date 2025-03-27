@@ -12,8 +12,8 @@ const Index = () => {
         </h1>
       </header>
 
-      {/* Main Game Area - Reducing top padding to move content up */}
-      <main className="flex-1 flex items-start justify-center pt-0 p-4 pb-2">
+      {/* Main Game Area - Centering content vertically */}
+      <main className="flex-1 flex items-center justify-center p-4 pb-2">
         <div className="w-full flex justify-center">
           <GameBoard />
         </div>
