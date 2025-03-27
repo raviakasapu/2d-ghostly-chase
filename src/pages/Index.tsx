@@ -12,7 +12,7 @@ const Index = () => {
           <span className="inline-block relative mx-[-2px]">
             <div 
               className="pacman-logo w-8 h-8 md:w-10 md:h-10"
-              style={{ transform: 'rotate(270deg)' }}
+              style={{ transform: 'rotate(0deg)' }}
             ></div>
           </span>
           -MAN
