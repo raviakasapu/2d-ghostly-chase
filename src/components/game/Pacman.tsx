@@ -23,21 +23,17 @@ const Pacman: React.FC<PacmanProps> = ({ position, direction, size, isMoving }) 
 
   return (
     <div
-      className={`pacman absolute ${isMoving ? 'animate-chomp' : ''}`}
+      className={`absolute ${isMoving ? 'animate-chomp' : ''}`}
       style={{
         width: size,
         height: size,
         left: position.x * size,
         top: position.y * size,
         transform: `rotate(${getRotation()}deg)`,
+        backgroundColor: '#FFCC00',
+        borderRadius: '50%',
       }}
-    >
-      {/* Inner circle to create pacman shape */}
-      <div className="absolute inset-0 bg-game-pacman rounded-full">
-        {/* Mouth animation is handled by CSS animations */}
-        <div className="pacman-mouth"></div>
-      </div>
-    </div>
+    />
   );
 };
 
