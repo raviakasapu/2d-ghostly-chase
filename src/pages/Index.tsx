@@ -4,7 +4,7 @@ import GameBoard from "../components/game/GameBoard";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-950 text-white">
+    <div className="min-h-screen flex flex-col bg-transparent text-white">
       {/* Header Section - Making it more compact */}
       <header className="py-2 px-6 flex justify-center">
         <h1 className="text-4xl md:text-5xl font-bold game-title">

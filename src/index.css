@@ -103,11 +103,11 @@
 
 @layer components {
   .game-container {
-    background-color: #000;
+    background-color: transparent;
     max-width: 100%;
     max-height: 100vh;
     aspect-ratio: 1 / 1;
-    @apply relative overflow-hidden rounded-lg shadow-xl;
+    @apply relative overflow-hidden rounded-lg;
     @apply transition-all duration-300 ease-in-out;
   }
 
@@ -202,7 +202,7 @@
   }
 
   .glass-panel {
-    @apply bg-white/10 backdrop-blur-md rounded-xl shadow-lg;
+    @apply bg-white/10 backdrop-blur-md rounded-xl;
     @apply border border-white/20;
     @apply transition-all duration-300 ease-in-out;
   }
