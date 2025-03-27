@@ -105,10 +105,11 @@
   .game-container {
     background-color: #000;
     max-width: 100%;
-    max-height: 100vh;
-    aspect-ratio: 1 / 1;
+    max-height: 90vh;
+    aspect-ratio: auto;
     @apply relative overflow-hidden rounded-lg shadow-xl;
     @apply transition-all duration-300 ease-in-out;
+    margin-bottom: 10px;
   }
 
   .pacman {
