@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { 
   Direction, 
@@ -14,7 +13,9 @@ import {
   calculateGhostTarget,
   getBestDirection,
   checkCollision,
-  calculateDistance
+  calculateDistance,
+  getValidDirections,
+  getOppositeDirection
 } from '../utils/gameUtils';
 
 const GHOST_SPEED = 175; // ms per ghost move
@@ -104,8 +105,21 @@ export const useGhostMovement = (
   const [pinkyPathIndex, setPinkyPathIndex] = useState(0);
   const [inkyPathIndex, setInkyPathIndex] = useState(0);
   const [clydePathIndex, setClydePathIndex] = useState(0);
+  const [lastPacmanPositions, setLastPacmanPositions] = useState<Position[]>([]);
   
   const ghostLoopRef = useRef<NodeJS.Timeout | null>(null);
+  
+  useEffect(() => {
+    if (gameState.gameStarted && !gameState.gamePaused && !gameState.gameOver) {
+      setLastPacmanPositions(prevPositions => {
+        const newPositions = [...prevPositions, { ...pacmanPosition }];
+        if (newPositions.length > 10) {
+          return newPositions.slice(newPositions.length - 10);
+        }
+        return newPositions;
+      });
+    }
+  }, [pacmanPosition, gameState]);
   
   const resetGhosts = useCallback(() => {
     setGhosts(prevGhosts => 
@@ -138,13 +152,67 @@ export const useGhostMovement = (
     }
   }, [ghosts, pacmanPosition, onGhostCollision]);
   
+  const getBlinkyTarget = () => {
+    return { ...pacmanPosition };
+  };
+  
+  const getPinkyTarget = () => {
+    const dir = pacmanDirection;
+    let targetPos = { ...pacmanPosition };
+    
+    switch (dir) {
+      case 'up':
+        targetPos.y -= 4;
+        break;
+      case 'down':
+        targetPos.y += 4;
+        break;
+      case 'left':
+        targetPos.x -= 4;
+        break;
+      case 'right':
+        targetPos.x += 4;
+        break;
+      default:
+        break;
+    }
+    
+    return targetPos;
+  };
+  
+  const getInkyTarget = () => {
+    if (lastPacmanPositions.length >= 5) {
+      return { ...lastPacmanPositions[0] };
+    }
+    
+    return inkyCirclePath[inkyPathIndex];
+  };
+  
+  const getClydeTarget = () => {
+    const distance = calculateDistance(ghosts[3].position, pacmanPosition);
+    
+    if (distance < 8) {
+      return { x: 0, y: MAZE_HEIGHT - 1 };
+    }
+    
+    if (Math.random() < 0.2) {
+      const validDirs = getValidDirections(maze, ghosts[3].position, getOppositeDirection(ghosts[3].direction));
+      if (validDirs.length > 0) {
+        const randomDir = validDirs[Math.floor(Math.random() * validDirs.length)];
+        return getNextPosition(ghosts[3].position, randomDir);
+      }
+    }
+    
+    return { ...pacmanPosition };
+  };
+  
   const moveGhosts = useCallback(() => {
     if (gameState.gamePaused || gameState.gameOver || !gameState.gameStarted) {
       return;
     }
     
     setGhosts(prevGhosts => 
-      prevGhosts.map(ghost => {
+      prevGhosts.map((ghost, index) => {
         let newState = ghost.state;
         let newFrightenedTimer = ghost.frightenedTimer;
         
@@ -153,39 +221,30 @@ export const useGhostMovement = (
           newFrightenedTimer = null;
         }
         
-        // Different behavior based on ghost type
         if (newState !== 'frightened') {
-          let nextTargetPosition;
-          let pathIndex;
-          let setPathIndex;
+          let targetPosition;
           
-          // Determine which path to follow based on ghost type
-          if (ghost.type === 'blinky') {
-            nextTargetPosition = blinkyCirclePath[blinkyPathIndex];
-            pathIndex = blinkyPathIndex;
-            setPathIndex = setBlinkyPathIndex;
-          } else if (ghost.type === 'pinky') {
-            nextTargetPosition = pinkyCirclePath[pinkyPathIndex];
-            pathIndex = pinkyPathIndex;
-            setPathIndex = setPinkyPathIndex;
-          } else if (ghost.type === 'inky') {
-            nextTargetPosition = inkyCirclePath[inkyPathIndex];
-            pathIndex = inkyPathIndex;
-            setPathIndex = setInkyPathIndex;
-          } else { // clyde
-            nextTargetPosition = clydeCirclePath[clydePathIndex];
-            pathIndex = clydePathIndex;
-            setPathIndex = setClydePathIndex;
-          }
-          
-          if (calculateDistance(ghost.position, nextTargetPosition) < 1) {
-            setPathIndex((prev: number) => (prev + 1) % 4);
+          switch (ghost.type) {
+            case 'blinky':
+              targetPosition = getBlinkyTarget();
+              break;
+            case 'pinky':
+              targetPosition = getPinkyTarget();
+              break;
+            case 'inky':
+              targetPosition = getInkyTarget();
+              break;
+            case 'clyde':
+              targetPosition = getClydeTarget();
+              break;
+            default:
+              targetPosition = { ...pacmanPosition };
           }
           
           const newDirection = getBestDirection(
             maze, 
             ghost.position, 
-            nextTargetPosition, 
+            targetPosition, 
             ghost.direction
           );
           
@@ -199,18 +258,15 @@ export const useGhostMovement = (
             position: newPosition,
             direction: newDirection,
             nextDirection: newDirection,
-            targetPosition: nextTargetPosition,
+            targetPosition: targetPosition,
             state: newState,
             frightenedTimer: newFrightenedTimer
           };
         } else {
-          // Frightened state handling - random movement
-          const validMoves = ['up', 'down', 'left', 'right'].filter(
-            dir => dir !== ghost.direction && isValidMove(maze, ghost.position, dir as Direction)
-          );
+          const validMoves = getValidDirections(maze, ghost.position, getOppositeDirection(ghost.direction));
           
           if (validMoves.length > 0) {
-            const randomDir = validMoves[Math.floor(Math.random() * validMoves.length)] as Direction;
+            const randomDir = validMoves[Math.floor(Math.random() * validMoves.length)];
             const newPosition = getNextPosition(ghost.position, randomDir);
             
             return {
@@ -223,11 +279,28 @@ export const useGhostMovement = (
             };
           }
           
-          // If no valid random moves, use best direction to current target
+          const cornerPositions = [
+            { x: 1, y: 1 },
+            { x: MAZE_WIDTH - 2, y: 1 },
+            { x: 1, y: MAZE_HEIGHT - 2 },
+            { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 }
+          ];
+          
+          let furthestCorner = cornerPositions[0];
+          let maxDistance = 0;
+          
+          for (const corner of cornerPositions) {
+            const dist = calculateDistance(pacmanPosition, corner);
+            if (dist > maxDistance) {
+              maxDistance = dist;
+              furthestCorner = corner;
+            }
+          }
+          
           const newDirection = getBestDirection(
             maze, 
             ghost.position, 
-            ghost.targetPosition, 
+            furthestCorner, 
             ghost.direction
           );
           
@@ -258,7 +331,8 @@ export const useGhostMovement = (
     blinkyPathIndex,
     pinkyPathIndex,
     inkyPathIndex,
-    clydePathIndex
+    clydePathIndex,
+    lastPacmanPositions
   ]);
   
   useEffect(() => {

@@ -11,6 +11,17 @@ interface PacmanProps {
 }
 
 const Pacman: React.FC<PacmanProps> = ({ position, direction, size, isMoving }) => {
+  // Determine rotation based on direction
+  const getRotation = () => {
+    switch (direction) {
+      case 'right': return 0;
+      case 'down': return 90;
+      case 'left': return 180;
+      case 'up': return 270;
+      default: return 0;
+    }
+  };
+
   return (
     <div
       className={`pacman absolute ${isMoving ? 'animate-chomp' : ''}`}
@@ -19,11 +30,14 @@ const Pacman: React.FC<PacmanProps> = ({ position, direction, size, isMoving }) 
         height: size,
         left: position.x * size,
         top: position.y * size,
-        transform: `rotate(0deg)`, // Always facing right
+        transform: `rotate(${getRotation()}deg)`,
       }}
     >
       {/* Inner circle to create pacman shape */}
-      <div className="absolute inset-0 bg-game-pacman rounded-full" />
+      <div className="absolute inset-0 bg-game-pacman rounded-full">
+        {/* Mouth animation is handled by CSS animations */}
+        <div className="pacman-mouth"></div>
+      </div>
     </div>
   );
 };
