@@ -34,18 +34,20 @@ const pinkyCirclePath = [
   { x: MAZE_WIDTH - 4, y: 4 },
 ];
 
+// Updated path for Inky to circle around a single block in bottom left
 const inkyCirclePath = [
-  { x: 2, y: MAZE_HEIGHT - 4 }, // bottom left area
-  { x: 4, y: MAZE_HEIGHT - 4 },
-  { x: 4, y: MAZE_HEIGHT - 2 },
-  { x: 2, y: MAZE_HEIGHT - 2 },
+  { x: 2, y: MAZE_HEIGHT - 4 }, 
+  { x: 3, y: MAZE_HEIGHT - 4 },
+  { x: 3, y: MAZE_HEIGHT - 3 },
+  { x: 2, y: MAZE_HEIGHT - 3 },
 ];
 
+// Updated path for Clyde to circle around a single block in bottom right
 const clydeCirclePath = [
-  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 4 }, // bottom right area
-  { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 4 },
-  { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 },
-  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 2 },
+  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 4 },
+  { x: MAZE_WIDTH - 3, y: MAZE_HEIGHT - 4 },
+  { x: MAZE_WIDTH - 3, y: MAZE_HEIGHT - 3 }, 
+  { x: MAZE_WIDTH - 4, y: MAZE_HEIGHT - 3 },
 ];
 
 export const useGhostMovement = (
